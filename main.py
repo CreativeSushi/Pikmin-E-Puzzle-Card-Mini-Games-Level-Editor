@@ -57,7 +57,7 @@ def load_footer_images(parent: tk.Frame, paths: list[str], row: int):
     """Load a row of images into a footer frame."""
     parent.images = getattr(parent, "images", [])
     for c, path in enumerate(paths):
-        img = Image.open(path).resize((36, 36), Image.LANCZOS)
+        img = Image.open(path).resize((36, 36), Image.Resampling.LANCZOS)
         photo = ImageTk.PhotoImage(img)
         parent.images.append(photo)
         tk.Label(parent, image=photo, bg="#ccc").grid(row=row, column=c, padx=1, pady=1)
@@ -148,7 +148,7 @@ def get_image(filename):
         print(f"Image not found: {full_path}")
         return None
     if filename not in image_cache:
-        img = Image.open(full_path).resize((cell_size, cell_size), Image.LANCZOS)
+        img = Image.open(full_path).resize((cell_size, cell_size), Image.Resampling.LANCZOS)
         image_cache[filename] = ImageTk.PhotoImage(img)
     return image_cache[filename]
 
