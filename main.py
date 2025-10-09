@@ -156,7 +156,7 @@ def get_image(filename):
 # --- Main UI ---
 root = tk.Tk()
 root.title("Pikmin E+ Level Editor")
-root.geometry("650x400")
+root.geometry("700x520")
 
 # --- Top button bar ---
 top_frame = tk.Frame(root)
