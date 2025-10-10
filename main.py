@@ -124,6 +124,7 @@ def loadgametype_1(block):
     for r in range(rows):
         for c in range(cols):
             byte_val = overlay_bytes[r*cols + c]
+            if byte_val == 0: continue
             filename = "pik"+f"{byte_val:02X}.png"
             img = get_image(filename)
             if img:
