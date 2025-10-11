@@ -12,13 +12,14 @@ rows, cols = 8, 11
 cell_size = 48
 TAB_NAMES = ["Level 1", "Level 2", "Level 3"]
 GT_OPTIONS = ["Plucking Pikmin", "Marching Pikmin", "Connecting Pikmin"]
-current_tab_index = 0
+current_tab_index = -1
 
 image_folder = "tiles"
 image_cache = {}
 
 main_grid_refs = [[None for _ in range(cols)] for _ in range(rows)]
 overlay_grid_refs = [[None for _ in range(cols)] for _ in range(rows)]
+img_frames = []
 
 TILE_PATHS = [f"tiles\\0{c}.png" for c in range(7)]
 PIKMIN_PATHS = [f"tiles\\Pik0{c+1}.png" for c in range(6)]
@@ -35,6 +36,7 @@ def show_tab(tab_index: int):
     for frame in frames:
         frame.pack_forget()
     frames[tab_index].pack(fill="both", expand=True)
+    global current_tab_index
     current_tab_index = tab_index
 
 def game_control(tab_index: int):
@@ -86,12 +88,12 @@ def load_bin_file():
             start = idx + 1
         
     #Change occurrences[:1] to occurrences[:3] when ready to develop more levels per card
-    for pos, seq_name, seq_bytes in occurrences[:1]:
+    for index, (pos, seq_name, seq_bytes) in enumerate(occurrences[:3]):
         print(seq_name)
         if seq_name == "SEQ1":
-            loadgametype_1(data[pos+21:pos+197])
+            loadgametype_1(data[pos+0x15:pos+0xC5], index)
                 
-def loadgametype_1(block):
+def loadgametype_1(block, level_index):
     #print(pos)
     #start = pos + 14
     #game1 = data[start:start + 183]
@@ -113,8 +115,8 @@ def loadgametype_1(block):
             img = get_image(filename)
             if img:
                 if main_grid_refs[r][c]:
-                    img_frame.delete(main_grid_refs[r][c])
-                main_grid_refs[r][c] = img_frame.create_image(
+                    img_frames[level_index].delete(main_grid_refs[r][c])
+                main_grid_refs[r][c] = img_frames[level_index].create_image(
                     c*cell_size, r*cell_size,
                     anchor="nw",
                     image=img
@@ -129,8 +131,8 @@ def loadgametype_1(block):
             img = get_image(filename)
             if img:
                 if overlay_grid_refs[r][c]:
-                    img_frame.delete(overlay_grid_refs[r][c])
-                overlay_grid_refs[r][c] = img_frame.create_image(
+                    img_frames[level_index].delete(overlay_grid_refs[r][c])
+                overlay_grid_refs[r][c] = img_frames[level_index].create_image(
                     c*cell_size, r*cell_size - 14,  # shifted up
                     anchor="nw",
                     image=img
@@ -220,6 +222,8 @@ for tab_index in range(len(TAB_NAMES)):
     
     img_frame = tk.Canvas(frame, bg="white", highlightthickness=0)
     img_frame.pack(side="left", fill="both", expand=True)
+    
+    img_frames.append(img_frame)
 
     # Footer
     footer_frame = tk.Frame(img_frame, bg="#ddd", height=100)
