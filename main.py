@@ -70,6 +70,9 @@ def load_bin_file():
         title="Select BIN File",
         filetypes=[("BIN files", "*.bin"), ("All files", "*.*")]
     )
+    _load_bin_file(file_path)
+    
+def _load_bin_file(file_path):
     if not file_path:
         return
     
