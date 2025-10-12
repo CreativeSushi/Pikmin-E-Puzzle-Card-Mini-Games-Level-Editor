@@ -55,14 +55,16 @@ def game_control(tab_index: int):
     print(f"[Tab {tab_index}] Game: {gt}, X={width}, Y={height}")
 
 
-def load_footer_images(parent: tk.Frame, paths: list[str], row: int):
+def load_footer_images(parent: tk.Frame, paths: list[str], row: int) -> list[ImageTk.PhotoImage]:
     """Load a row of images into a footer frame."""
-    parent.images = getattr(parent, "images", [])
+    images = []
     for c, path in enumerate(paths):
         img = Image.open(path).resize((36, 36), Image.Resampling.LANCZOS)
         photo = ImageTk.PhotoImage(img)
-        parent.images.append(photo)
+        images.append(photo)
         tk.Label(parent, image=photo, bg="#ccc").grid(row=row, column=c, padx=1, pady=1)
+
+    return images
 
 def load_bin_file():
     """Prompt user to select a BIN file, search for sequence, load PNGs."""
@@ -178,7 +180,7 @@ for i, name in enumerate(TAB_NAMES):
     )
 
 # --- Content frames ---
-frames, images = [], [None] * len(TAB_NAMES)
+frames, images = [], []
 gt_vars, width_vars, height_vars = [], [], []
 
 for tab_index in range(len(TAB_NAMES)):
@@ -231,8 +233,8 @@ for tab_index in range(len(TAB_NAMES)):
     # Footer
     footer_frame = tk.Frame(img_frame, bg="#ddd", height=100)
     footer_frame.pack(side="bottom", fill="x")
-    load_footer_images(footer_frame, TILE_PATHS, row=0)
-    load_footer_images(footer_frame, PIKMIN_PATHS, row=1)
+    images.append(load_footer_images(footer_frame, TILE_PATHS, row=0))
+    images.append(load_footer_images(footer_frame, PIKMIN_PATHS, row=1))
 
     frames.append(frame)
 
