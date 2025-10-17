@@ -3,6 +3,8 @@ from tkinter import ttk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 import os
+import piket
+from pathlib import Path
 
 # --- Config ---
 DEFAULT_GAMETYPE = "Plucking Pikmin"
@@ -66,22 +68,25 @@ def load_footer_images(parent: tk.Frame, paths: list[str], row: int) -> list[Ima
 
     return images
 
-def load_bin_file():
-    """Prompt user to select a BIN file, search for sequence, load PNGs."""
-    file_path = filedialog.askopenfilename(
-        title="Select BIN File",
-        filetypes=[("BIN files", "*.bin"), ("All files", "*.*")]
-    )
-    _load_bin_file(file_path)
-    
-def _load_bin_file(file_path):
-    if not file_path:
+def load_card_data():
+    """Prompt user to select either a RAW or BIN file, search for sequence, load PNGs."""
+    file_path = Path(filedialog.askopenfilename(
+        title="Select RAW or BIN File",
+        filetypes=[("BIN files", "*.bin"), ("RAW files", "*.raw"), ("All files", "*.*")]
+    )).resolve()
+
+    if file_path.suffix == ".raw":
+        # use piket to decode
+        _load_card_data(piket.decode_raw(file_path))
+    else:
+        # attempt to load file bytes
+        _load_card_data(file_path.read_bytes())
+
+def _load_card_data(data: bytes):
+    if not data:
         return
     
     occurrences = []
-    
-    with open(file_path, "rb") as f:
-        data = f.read()
         
     for seq_name, seq_bytes in sequences.items():
         start = 0
@@ -171,7 +176,7 @@ top_frame = tk.Frame(root)
 top_frame.pack(side="top", fill="x")
 
 tk.Button(
-    top_frame, text="Import card data", command=load_bin_file, bg="#d9ead3"
+    top_frame, text="Import card data", command=load_card_data, bg="#d9ead3"
 ).pack(side="left", padx=5, pady=5)
 
 for i, name in enumerate(TAB_NAMES):
